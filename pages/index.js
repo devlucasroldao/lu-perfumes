@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+
+// Se você ainda não criou esses componentes, eles vão dar erro!
 import Navbar from '../components/Navbar';
 import ProdutoCard from '../components/ProdutoCard';
-import Link from 'next/link';
 
 const produtosDestaque = [
   { id: 1, nome: 'Glamour Rose', marca: 'O Boticário', descricao: 'Floral sofisticado com notas de rosa e baunilha.', linha: 'feminino', foto: '' },
@@ -10,15 +13,31 @@ const produtosDestaque = [
   { id: 4, nome: 'Kit Presente Baby', marca: 'Natura', descricao: 'Kit completo para bebês com produtos suaves.', linha: 'baby', foto: '' },
 ];
 
+// Essa é a "casca" que faltava! Tudo precisa ficar dentro dela.
 export default function Home() {
+
   const [sacola, setSacola] = useState([]);
 
+  useEffect(() => {
+    const salva = localStorage.getItem('sacola');
+    if (salva) setSacola(JSON.parse(salva));
+  }, []);
+
   const addSacola = (produto) => {
-    setSacola(prev => [...prev, produto]);
+    setSacola(prev => {
+      const nova = [...prev, produto];
+      localStorage.setItem('sacola', JSON.stringify(nova));
+      return nova;
+    });
   };
 
+  // O HTML precisa estar dentro de um 'return'
   return (
     <div>
+      <Head>
+        <title>Lu Perfumes</title>
+      </Head>
+
       <Navbar sacolaCount={sacola.length} />
 
       {/* Banner */}
@@ -68,6 +87,7 @@ export default function Home() {
   );
 }
 
+// Os estilos ficam de fora da função principal
 const styles = {
   banner: { background: 'linear-gradient(135deg, var(--verde) 0%, #9aab7a 100%)', color: '#fff', padding: '80px 24px', textAlign: 'center' },
   bannerContent: { maxWidth: 600, margin: '0 auto' },
